@@ -10,7 +10,7 @@ const webdriver = require('selenium-webdriver'), // 加入虛擬網頁套件
 const chrome = require('selenium-webdriver/chrome');
 const path = require('path');
 const fs = require('fs');
-
+const cheerio = require('cheerio');
 function checkDriver() {
     try {
         chrome.getDefaultService();
@@ -61,6 +61,17 @@ async function loginFaceBook() {
     driver.quit();
 }
 
+const chrome = require('selenium-webdriver/chrome');
+const { Builder, By, Key, until } = require('selenium-webdriver');
+const screen = {
+    width: 640,
+    height: 480
+};
+let driver = new Builder()
+    .forBrowser('chrome')
+    .setChromeOptions(new chrome.Options().headless().windowSize(screen))
+    .build();
+
 async function loginInstagram() {
     const options = new chrome.Options();
     options.setUserPreferences({ 'profile.default_content_setting_values.notifications': 1 });//close FaceBook notifications
@@ -81,8 +92,30 @@ async function loginInstagram() {
     const followerPage = 'https://www.instagram.com/cindiatsai/';
     await driver.get(followerPage);
     await driver.sleep(3000);
-    const pageSource = await driver.wait(until.elementLocated(By.css('body')), 5000).getAttribute('innerHTML');
-    console.log('pageSource: ', pageSource);
+    //const pageSource = await driver.wait(until.elementLocated(By.class('_9AhH0')));
+    //console.log(pageSource);
+    /*const pageSource = await driver.wait(until.elementLocated(By.css('body')), 5000).getAttribute('innerHTML');
+    console.log('pageSource: ', pageSource);*/
+    const pageSource = await driver.wait(until.elementLocated(By.css('img')), 5000).getAttribute('innerHTML');
+    console.log(pageSource);
+
+    fs.writeFile('SourceCode.txt', pageSource, function (err) {
+        if (err)
+            console.log(err);
+        else
+            console.log('Write operation complete.');
+    });
+
+    /*url = 'https://www.instagram.com/p/CE_bR-osw4M/'
+    browser.get(url)
+    soup = Soup(browser.page_source,"lxml")
+    soup.find_all(class_="KL4Bh")[0].img.get('src')
+    # 獲取影片連結
+    url = 'https://www.instagram.com/p/CFHwyL6s9Gn/'
+    browser.get(url)
+    soup = Soup(browser.page_source,"lxml")
+    soup.find_all(class_="_5wCQW")[0].video.get('src')*/
+
 
     //console.log("hi");
 }
